@@ -7,6 +7,7 @@ public class Player : MonoBehaviour {
     [SerializeField] float jumpHeight = 4f;
     [SerializeField] float secondsToJumpApex = 0.5f;
     [SerializeField] float fallingTerminalVelocity = 5f;
+    [SerializeField] float horizontalVelocity = 1f;
 
     private Controller2D controller;
 
@@ -42,6 +43,9 @@ public class Player : MonoBehaviour {
         if (velocity.y < 0) {
             velocity.y = Mathf.Max(velocity.y, -fallingTerminalVelocity);
         }
+
+        int xInput = (Input.GetKey(KeyCode.D) ? 1 : 0) - (Input.GetKey(KeyCode.A) ? 1 : 0);
+        velocity.x = xInput * horizontalVelocity;
 
         Vector2 positionDelta = (oldVelocity + velocity) * 0.5f * Time.deltaTime;
         controller.move(positionDelta);

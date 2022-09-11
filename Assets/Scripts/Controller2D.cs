@@ -32,6 +32,7 @@ public class Controller2D : MonoBehaviour {
         updateRaycastData();
 
         collisionInfo.reset();
+        checkHorizontalCollisions(ref positionDelta);
         checkVerticalCollisions(ref positionDelta);
 
         transform.Translate(positionDelta);
@@ -51,6 +52,25 @@ public class Controller2D : MonoBehaviour {
 
         horizontalRaySpacing = bounds.size.y / (horizontalRayCount - 1);
         verticalRaySpacing = bounds.size.x / (verticalRayCount - 1);
+    }
+
+    private void checkHorizontalCollisions(ref Vector2 positionDelta) {
+        float xDirection = Mathf.Sign(positionDelta.x);
+        float rayLength = Mathf.Abs(positionDelta.x) + SKIN_WIDTH;
+
+        Vector2 rayStartingPosition = xDirection < 0 ? raycastOrigins.bottomLeft : raycastOrigins.bottomRight;
+        Vector2 rayDirection = Vector2.right * xDirection;
+        for (int i = 0; i < horizontalRayCount; i++) {
+            Vector2 rayPosition = rayStartingPosition + Vector2.up * horizontalRaySpacing * i;
+            RaycastHit2D hit = Physics2D.Raycast(rayPosition, rayDirection, rayLength, collisionMask);
+            if (hit.collider != null) {
+                positionDelta.x = xDirection * (hit.distance - SKIN_WIDTH);
+                rayLength = hit.distance;
+
+                collisionInfo.left = xDirection == -1;
+                collisionInfo.right = !collisionInfo.left;
+            }
+        }
     }
 
     private void checkVerticalCollisions(ref Vector2 positionDelta) {
